@@ -21,6 +21,8 @@ class EncryptionFrame {
     private lateinit var textBox: JTextField
     private lateinit var seedBox: JTextField
     private lateinit var output: JTextField
+
+    @Suppress("SpellCheckingInspection")
     private val charSet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()_+-={}|\\[]:;\"'<>,.?/".toCharArray().toList()
 
     init {
@@ -91,7 +93,7 @@ class EncryptionFrame {
         mainFrame.isVisible = true
     }
 
-    fun shuffleCharSetWithKey(key: Long): List<Char> {
+    private fun shuffleCharSetWithKey(key: Long): List<Char> {
         return charSet.shuffled(Random(key))
     }
 
