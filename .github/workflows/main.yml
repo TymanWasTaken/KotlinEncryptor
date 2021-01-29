@@ -41,4 +41,5 @@ jobs:
     - name: Upload jar
       uses: actions/upload-artifact@v2
       with:
+        name: KotlinEncryptor
         path: build/libs/*.jar
