@@ -1,3 +1,4 @@
+import com.formdev.flatlaf.FlatDarkLaf
 import java.awt.FlowLayout
 import java.awt.GridLayout
 import java.awt.event.ActionEvent
@@ -8,8 +9,7 @@ import javax.swing.*
 
 import kotlin.random.Random
 import kotlin.system.exitProcess
-
-
+import javax.swing.JFrame
 
 class EncryptionFrame {
 
@@ -30,6 +30,11 @@ class EncryptionFrame {
     }
 
     private fun prepareGUI() {
+
+        FlatDarkLaf.install()
+
+        JFrame.setDefaultLookAndFeelDecorated(true)
+
         keyLabel = JLabel("Enter key:", JLabel.CENTER)
         textLabel = JLabel("Enter text:", JLabel.CENTER)
         outputLabel = JLabel("Output:", JLabel.CENTER)
@@ -65,13 +70,7 @@ class EncryptionFrame {
             add(outputLabel)
             add(output)
             iconImage = icon.image
-
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-            } catch (e: Exception) {
-                println("Could not set look and feel")
-            }
-
+            isUndecorated = true
             isVisible = true
         }
     }
@@ -132,6 +131,7 @@ class EncryptionFrame {
     }
 
     fun sendError(message: String) {
+        JFrame.setDefaultLookAndFeelDecorated(true)
         JOptionPane.showMessageDialog(
             JFrame(), message, "Error",
             JOptionPane.ERROR_MESSAGE

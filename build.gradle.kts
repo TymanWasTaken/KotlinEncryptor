@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test-junit"))
+    implementation("com.formdev:flatlaf:1.0-rc1")
 }
 
 tasks.test {
