@@ -63,6 +63,13 @@ class EncryptionFrame {
             add(outputLabel)
             add(output)
             iconImage = icon.image
+
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+            } catch (e: Exception) {
+                println("Could not set look and feel")
+            }
+
             isVisible = true
         }
     }

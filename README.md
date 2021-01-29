@@ -10,8 +10,8 @@ similar letters
 
 ## Images:
 
-![Image of window](http://tyman.tech/TmM2fdl6Sh.png)
-![Example encryption](http://tyman.tech/K5UMXW7WFr.png)
+![Image of window](https://tyman.tech/v8kVVCcLu1.png)
+![Example encryption](https://tyman.tech/gAxEbOG0Vs.png)
 
 ~~this is my first kotlin project ever don't make fun of me
 if its bad~~
