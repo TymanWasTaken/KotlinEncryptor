@@ -133,8 +133,12 @@ class EncryptionFrame {
         var currentKey = key
         var shuffledCharSet = shuffleCharSetWithKey(currentKey)
         encryptedText = text.toList().map {
-            if (it == ' ') {
-                return@map ' '
+            if ((it == ' ') or (it == '\u200b')) {
+                if (decrypt) {
+                    return@map ' '
+                } else {
+                    return@map '\u200b'
+                }
             } else {
                 val changedChar: Char
                 if (decrypt) {
@@ -158,7 +162,7 @@ class EncryptionFrame {
 
     fun isValidText(text: String): Boolean {
         return text.any {
-            charSet.contains(it) or (it == ' ')
+            charSet.contains(it) or (it == ' ') or (it == '\u200b')
         }
     }
 
