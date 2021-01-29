@@ -1,6 +1,7 @@
 import com.formdev.flatlaf.FlatDarkLaf
 import java.awt.FlowLayout
 import java.awt.GridLayout
+import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.WindowAdapter
@@ -10,16 +11,24 @@ import javax.swing.*
 import kotlin.random.Random
 import kotlin.system.exitProcess
 import javax.swing.JFrame
+import java.awt.datatransfer.Clipboard
+
+import java.awt.datatransfer.StringSelection
+
+
+
 
 class EncryptionFrame {
 
     private lateinit var mainFrame: JFrame
     private lateinit var keyLabel: JLabel
-    private lateinit var textLabel: JLabel
+    private lateinit var encryptionLabel: JLabel
     private lateinit var outputLabel: JLabel
-    private lateinit var controlPanel: JPanel
-    private lateinit var textBox: JTextField
-    private lateinit var seedBox: JTextField
+    private lateinit var keyPanel: JPanel
+    private lateinit var encryptionPanel: JPanel
+    private lateinit var outputPanel: JPanel
+    private lateinit var encryptionBox: JTextField
+    private lateinit var keyBox: JTextField
     private lateinit var output: JTextField
 
     @Suppress("SpellCheckingInspection")
@@ -29,23 +38,31 @@ class EncryptionFrame {
         prepareGUI()
     }
 
+    private fun addAll(frame: JFrame, vararg components: java.awt.Component) {
+        components.forEach {
+            frame.add(it)
+        }
+    }
+
     private fun prepareGUI() {
 
+        // Set up dark mode
         FlatDarkLaf.install()
-
         JFrame.setDefaultLookAndFeelDecorated(true)
 
         keyLabel = JLabel("Enter key:", JLabel.CENTER)
-        textLabel = JLabel("Enter text:", JLabel.CENTER)
+        encryptionLabel = JLabel("Enter text:", JLabel.CENTER)
         outputLabel = JLabel("Output:", JLabel.CENTER)
 
-        seedBox = JTextField().apply {
+        keyBox = JTextField().apply {
             setSize(10, 50)
         }
 
-        textBox = JTextField()
+        encryptionBox = JTextField()
 
-        controlPanel = JPanel().apply { layout = FlowLayout() }
+        keyPanel = JPanel().apply { layout = FlowLayout() }
+        encryptionPanel = JPanel().apply { layout = FlowLayout() }
+        outputPanel = JPanel().apply { layout = FlowLayout() }
 
         output = JTextField().apply {
             isEditable = false
@@ -56,19 +73,20 @@ class EncryptionFrame {
 
         mainFrame = JFrame("Text Encryptor").apply {
             setSize(300, 300)
-            layout = GridLayout(7, 1)
+            layout = GridLayout(9, 1)
             addWindowListener(object : WindowAdapter() {
                 override fun windowClosing(windowEvent: WindowEvent?) {
                     exitProcess(0)
                 }
             })
-            add(keyLabel)
-            add(seedBox)
-            add(textLabel)
-            add(textBox)
-            add(controlPanel)
-            add(outputLabel)
-            add(output)
+            addAll(this,
+                // key components
+                keyLabel, keyBox, keyPanel,
+                // encryption components
+                encryptionLabel, encryptionBox, encryptionPanel,
+                // output components
+                outputLabel, output, outputPanel
+            )
             iconImage = icon.image
             isUndecorated = true
             isVisible = true
@@ -77,17 +95,31 @@ class EncryptionFrame {
 
     internal fun show() {
 
+        val buttonClickListener = ButtonClickListener()
+
+        val randKeyButton = JButton("Randomize").apply {
+            actionCommand = "RANDOMIZE_KEY"
+            addActionListener(buttonClickListener)
+        }
+        keyPanel.add(randKeyButton)
+
         val encryptButton = JButton("Encrypt").apply {
             actionCommand = "ENCRYPT"
-            addActionListener(ButtonClickListener())
+            addActionListener(buttonClickListener)
         }
-        controlPanel.add(encryptButton)
 
         val decryptButton = JButton("Decrypt").apply {
             actionCommand = "DECRYPT"
-            addActionListener(ButtonClickListener())
+            addActionListener(buttonClickListener)
         }
-        controlPanel.add(decryptButton)
+        encryptionPanel.add(encryptButton)
+        encryptionPanel.add(decryptButton)
+
+        val copyButton = JButton("Copy result").apply {
+            actionCommand = "COPY"
+            addActionListener(buttonClickListener)
+        }
+        outputPanel.add(copyButton)
 
         mainFrame.isVisible = true
     }
@@ -121,7 +153,7 @@ class EncryptionFrame {
     }
 
     fun getSeed(): Long? {
-        return seedBox.text.toLongOrNull()
+        return keyBox.text.toLongOrNull()
     }
 
     fun isValidText(text: String): Boolean {
@@ -141,16 +173,24 @@ class EncryptionFrame {
     private inner class ButtonClickListener : ActionListener {
         override fun actionPerformed(e: ActionEvent) {
             if (e.actionCommand == "ENCRYPT" || e.actionCommand == "DECRYPT") {
-                if (isValidText(textBox.text)) {
+                if (isValidText(encryptionBox.text)) {
                     val seed = getSeed()
                     if (seed is Long) {
-                        output.text = runEncryptor(seed, textBox.text, e.actionCommand == "DECRYPT")
+                        output.text = runEncryptor(seed, encryptionBox.text, e.actionCommand == "DECRYPT")
                     } else {
                         sendError("Key must be a number!")
                     }
                 } else {
                     sendError("Invalid text!")
                 }
+            } else if (e.actionCommand == "RANDOMIZE_KEY") {
+                keyBox.text = (1..1000000).random().toString()
+            } else if (e.actionCommand == "COPY") {
+                output.selectAll()
+                output.requestFocus()
+                val stringSelection = StringSelection(output.text)
+                val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                clipboard.setContents(stringSelection, null)
             } else {
                 exitProcess(2)
             }
